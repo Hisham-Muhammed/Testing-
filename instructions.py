@@ -48,6 +48,7 @@ class InstructionSet:
         cpu.registers[register] += 1
 
         if cpu.registers[register] > 255:
+
             cpu.registers[register] = 0
 
         cpu.zero_flag = (
@@ -61,6 +62,7 @@ class InstructionSet:
         cpu.registers[register] -= 1
 
         if cpu.registers[register] < 0:
+
             cpu.registers[register] = 255
 
         cpu.zero_flag = (
