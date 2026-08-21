@@ -1,5 +1,6 @@
 from instructions import InstructionSet
 from stack import Stack
+from gpio import GPIO
 
 
 class CPU:
@@ -8,19 +9,29 @@ class CPU:
 
         self.memory = memory
 
+        # 8-bit registers R0-R7
         self.registers = [0] * 8
 
+        # Accumulator
         self.A = 0
 
+        # Program Counter
         self.PC = 0
 
+        # Stack Pointer
         self.SP = 7
 
+        # Stack
         self.stack = Stack()
 
+        # GPIO
+        self.gpio = GPIO()
+
+        # Flags
         self.zero_flag = False
         self.carry_flag = False
 
+        # CPU status
         self.halted = False
 
 
@@ -29,12 +40,12 @@ class CPU:
         self.registers = [0] * 8
 
         self.A = 0
-
         self.PC = 0
-
         self.SP = 7
 
         self.stack = Stack()
+
+        self.gpio = GPIO()
 
         self.zero_flag = False
         self.carry_flag = False
@@ -174,6 +185,31 @@ class CPU:
                 return
 
 
+        elif operation == "SET_PIN":
+
+            pin = instruction[1]
+
+            self.gpio.set_pin(pin)
+
+
+        elif operation == "CLEAR_PIN":
+
+            pin = instruction[1]
+
+            self.gpio.clear_pin(pin)
+
+
+        elif operation == "READ_PIN":
+
+            pin = instruction[1]
+
+            value = self.gpio.read_pin(pin)
+
+            print(
+                f"GPIO Pin {pin} = {value}"
+            )
+
+
         elif operation == "HALT":
 
             InstructionSet.HALT(self)
@@ -240,5 +276,7 @@ class CPU:
         )
 
         self.stack.show()
+
+        self.gpio.show()
 
         print("---------------------")
