@@ -1,112 +1,84 @@
-from instructions import InstructionSet
+def decode_execute(self, instruction):
+
+    if instruction is None:
+        print("No instruction at address:", self.PC)
+        self.halted = True
+        return
+
+    operation = instruction[0]
+
+    print("DECODE:", operation)
 
 
-class CPU:
+    if operation == "MOV":
 
-    def __init__(self, memory):
+        register = instruction[1]
+        value = instruction[2]
 
-        self.memory = memory
+        InstructionSet.MOV(
+            self,
+            register,
+            value
+        )
 
-        # 8-bit registers R0-R7
-        self.registers = [0] * 8
 
-        # Accumulator
-        self.A = 0
+    elif operation == "ADD":
 
-        # Program Counter
-        self.PC = 0
+        register = instruction[1]
 
-        # Stack Pointer
-        self.SP = 7
+        InstructionSet.ADD(
+            self,
+            register
+        )
 
-        # Flags
-        self.zero_flag = False
-        self.carry_flag = False
 
-        # CPU status
-        self.halted = False
+    elif operation == "SUB":
 
-    def reset(self):
+        register = instruction[1]
 
-        self.registers = [0] * 8
+        InstructionSet.SUB(
+            self,
+            register
+        )
 
-        self.A = 0
-        self.PC = 0
-        self.SP = 7
 
-        self.zero_flag = False
-        self.carry_flag = False
+    elif operation == "INC":
 
-        self.halted = False
+        register = instruction[1]
 
-    def fetch(self):
+        InstructionSet.INC(
+            self,
+            register
+        )
 
-        instruction = self.memory.read_program(self.PC)
 
-        print("FETCH:", instruction)
+    elif operation == "DEC":
 
-        return instruction
+        register = instruction[1]
 
-    def decode_execute(self, instruction):
+        InstructionSet.DEC(
+            self,
+            register
+        )
 
-        if instruction is None:
-            print("No instruction at address:", self.PC)
-            self.halted = True
-            return
 
-        operation = instruction[0]
+    elif operation == "HALT":
 
-        print("DECODE:", operation)
+        InstructionSet.HALT(self)
 
-        if operation == "MOV":
 
-            register = instruction[1]
-            value = instruction[2]
+    else:
 
-            InstructionSet.MOV(
-                self,
-                register,
-                value
-            )
+        print("Unknown instruction:", operation)
 
-        elif operation == "ADD":
+        self.halted = True
 
-            register = instruction[1]
+        return
 
-            InstructionSet.ADD(
-                self,
-                register
-            )
 
-        elif operation == "HALT":
+    if not self.halted:
 
-            InstructionSet.HALT(self)
-
-        else:
-
-            print("Unknown instruction:", operation)
-            self.halted = True
-            return
-
-        if not self.halted:
-            self.PC += 1
-
-    def step(self):
-
-        if self.halted:
-            return
-
-        instruction = self.fetch()
-
-        self.decode_execute(instruction)
-
-    def show_state(self):
-
-        print("\n----- CPU STATE -----")
-
-        for i in range(8):
-
-            print(f"R{i} =", self.registers[i])
+        self.PC += 1            print(f"R{i} =", self.registers[i])
 
         print("A  =", self.A)
         print("PC =", self.PC)
