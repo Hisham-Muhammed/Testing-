@@ -3,19 +3,27 @@ from instructions import InstructionSet
 
 class CPU:
 
-    def __init__(self):
+    def __init__(self, memory):
 
+        self.memory = memory
+
+        # 8-bit registers R0-R7
         self.registers = [0] * 8
 
+        # Accumulator
         self.A = 0
 
+        # Program Counter
         self.PC = 0
 
+        # Stack Pointer
         self.SP = 7
 
+        # Flags
         self.zero_flag = False
         self.carry_flag = False
 
+        # CPU status
         self.halted = False
 
     def reset(self):
@@ -31,9 +39,24 @@ class CPU:
 
         self.halted = False
 
-    def execute(self, instruction):
+    def fetch(self):
+
+        instruction = self.memory.read_program(self.PC)
+
+        print("FETCH:", instruction)
+
+        return instruction
+
+    def decode_execute(self, instruction):
+
+        if instruction is None:
+            print("No instruction at address:", self.PC)
+            self.halted = True
+            return
 
         operation = instruction[0]
+
+        print("DECODE:", operation)
 
         if operation == "MOV":
 
@@ -62,13 +85,24 @@ class CPU:
         else:
 
             print("Unknown instruction:", operation)
+            self.halted = True
             return
 
-        self.PC += 1
+        if not self.halted:
+            self.PC += 1
+
+    def step(self):
+
+        if self.halted:
+            return
+
+        instruction = self.fetch()
+
+        self.decode_execute(instruction)
 
     def show_state(self):
 
-        print("----- CPU STATE -----")
+        print("\n----- CPU STATE -----")
 
         for i in range(8):
 
