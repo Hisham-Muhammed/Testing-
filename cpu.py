@@ -10,32 +10,23 @@ class CPU:
 
         self.memory = memory
 
-        # 8-bit registers R0-R7
         self.registers = [0] * 8
 
-        # Accumulator
         self.A = 0
 
-        # Program Counter
         self.PC = 0
 
-        # Stack Pointer
         self.SP = 7
 
-        # Stack
         self.stack = Stack()
 
-        # GPIO
         self.gpio = GPIO()
 
-        # Timer
         self.timer = Timer()
 
-        # Flags
         self.zero_flag = False
         self.carry_flag = False
 
-        # CPU status
         self.halted = False
 
 
@@ -236,106 +227,8 @@ class CPU:
         elif operation == "TIMER_READ":
 
             print(
-            InstructionSet.SUB(
-                self,
-                register
-            )
-
-
-        elif operation == "INC":
-
-            register = instruction[1]
-
-            InstructionSet.INC(
-                self,
-                register
-            )
-
-
-        elif operation == "DEC":
-
-            register = instruction[1]
-
-            InstructionSet.DEC(
-                self,
-                register
-            )
-
-
-        elif operation == "PUSH":
-
-            register = instruction[1]
-
-            value = self.registers[register]
-
-            if self.stack.push(value):
-
-                self.SP += 1
-
-
-        elif operation == "POP":
-
-            register = instruction[1]
-
-            value = self.stack.pop()
-
-            if value is not None:
-
-                self.registers[register] = value
-
-                self.SP -= 1
-
-
-        elif operation == "CALL":
-
-            target_address = instruction[1]
-
-            return_address = self.PC + 1
-
-            if self.stack.push(return_address):
-
-                self.SP += 1
-
-                self.PC = target_address
-
-                return
-
-
-        elif operation == "RET":
-
-            return_address = self.stack.pop()
-
-            if return_address is not None:
-
-                self.SP -= 1
-
-                self.PC = return_address
-
-                return
-
-
-        elif operation == "SET_PIN":
-
-            pin = instruction[1]
-
-            self.gpio.set_pin(pin)
-
-
-        elif operation == "CLEAR_PIN":
-
-            pin = instruction[1]
-
-            self.gpio.clear_pin(pin)
-
-
-        elif operation == "READ_PIN":
-
-            pin = instruction[1]
-
-            value = self.gpio.read_pin(pin)
-
-            print(
-                f"GPIO Pin {pin} = {value}"
+                "Timer Value =",
+                self.timer.get_value()
             )
 
 
@@ -354,6 +247,11 @@ class CPU:
             self.halted = True
 
             return
+
+
+        # One CPU instruction = one timer tick
+
+        self.timer.tick()
 
 
         if not self.halted:
@@ -407,5 +305,7 @@ class CPU:
         self.stack.show()
 
         self.gpio.show()
+
+        self.timer.show()
 
         print("---------------------")
