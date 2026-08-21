@@ -1,6 +1,7 @@
 from instructions import InstructionSet
 from stack import Stack
 from gpio import GPIO
+from timer import Timer
 
 
 class CPU:
@@ -27,6 +28,9 @@ class CPU:
         # GPIO
         self.gpio = GPIO()
 
+        # Timer
+        self.timer = Timer()
+
         # Flags
         self.zero_flag = False
         self.carry_flag = False
@@ -40,12 +44,16 @@ class CPU:
         self.registers = [0] * 8
 
         self.A = 0
+
         self.PC = 0
+
         self.SP = 7
 
         self.stack = Stack()
 
         self.gpio = GPIO()
+
+        self.timer = Timer()
 
         self.zero_flag = False
         self.carry_flag = False
@@ -107,6 +115,127 @@ class CPU:
 
             register = instruction[1]
 
+            InstructionSet.SUB(
+                self,
+                register
+            )
+
+
+        elif operation == "INC":
+
+            register = instruction[1]
+
+            InstructionSet.INC(
+                self,
+                register
+            )
+
+
+        elif operation == "DEC":
+
+            register = instruction[1]
+
+            InstructionSet.DEC(
+                self,
+                register
+            )
+
+
+        elif operation == "PUSH":
+
+            register = instruction[1]
+
+            value = self.registers[register]
+
+            if self.stack.push(value):
+
+                self.SP += 1
+
+
+        elif operation == "POP":
+
+            register = instruction[1]
+
+            value = self.stack.pop()
+
+            if value is not None:
+
+                self.registers[register] = value
+
+                self.SP -= 1
+
+
+        elif operation == "CALL":
+
+            target_address = instruction[1]
+
+            return_address = self.PC + 1
+
+            if self.stack.push(return_address):
+
+                self.SP += 1
+
+                self.PC = target_address
+
+                return
+
+
+        elif operation == "RET":
+
+            return_address = self.stack.pop()
+
+            if return_address is not None:
+
+                self.SP -= 1
+
+                self.PC = return_address
+
+                return
+
+
+        elif operation == "SET_PIN":
+
+            pin = instruction[1]
+
+            self.gpio.set_pin(pin)
+
+
+        elif operation == "CLEAR_PIN":
+
+            pin = instruction[1]
+
+            self.gpio.clear_pin(pin)
+
+
+        elif operation == "READ_PIN":
+
+            pin = instruction[1]
+
+            value = self.gpio.read_pin(pin)
+
+            print(
+                f"GPIO Pin {pin} = {value}"
+            )
+
+
+        elif operation == "TIMER_START":
+
+            self.timer.start()
+
+
+        elif operation == "TIMER_STOP":
+
+            self.timer.stop()
+
+
+        elif operation == "TIMER_RESET":
+
+            self.timer.reset()
+
+
+        elif operation == "TIMER_READ":
+
+            print(
             InstructionSet.SUB(
                 self,
                 register
