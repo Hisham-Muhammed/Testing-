@@ -9,21 +9,29 @@ memory = Memory()
 cpu = CPU(memory)
 
 
-# Program to execute
+# Program to test PUSH and POP
 program = [
+
     ("MOV", 0, 10),
-    ("MOV", 1, 5),
-    ("INC", 0),
-    ("DEC", 1),
-    ("ADD", 0),
-    ("SUB", 1),
+
+    ("PUSH", 0),
+
+    ("MOV", 1, 20),
+
+    ("POP", 1),
+
     ("HALT",)
+
 ]
 
 
 # Load program into program memory
 for address, instruction in enumerate(program):
-    memory.write_program(address, instruction)
+
+    memory.write_program(
+        address,
+        instruction
+    )
 
 
 print("===== MicroOS-Sim =====")
