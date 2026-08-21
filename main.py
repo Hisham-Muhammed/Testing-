@@ -9,18 +9,18 @@ memory = Memory()
 cpu = CPU(memory)
 
 
-# Program to test CALL and RET
+# Program to test GPIO
 program = [
 
-    ("MOV", 0, 10),
+    ("SET_PIN", 2),
 
-    ("CALL", 3),
+    ("READ_PIN", 2),
 
-    ("HALT",),
+    ("CLEAR_PIN", 2),
 
-    ("INC", 0),
+    ("READ_PIN", 2),
 
-    ("RET",)
+    ("HALT",)
 
 ]
 
