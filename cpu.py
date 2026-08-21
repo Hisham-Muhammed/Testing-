@@ -2,6 +2,7 @@ from instructions import InstructionSet
 from stack import Stack
 from gpio import GPIO
 from timer import Timer
+from interrupt import InterruptController
 
 
 class CPU:
@@ -24,10 +25,14 @@ class CPU:
 
         self.timer = Timer()
 
+        self.interrupt = InterruptController()
+
         self.zero_flag = False
         self.carry_flag = False
 
         self.halted = False
+
+        self.interrupt_enabled = True
 
 
     def reset(self):
@@ -46,10 +51,14 @@ class CPU:
 
         self.timer = Timer()
 
+        self.interrupt = InterruptController()
+
         self.zero_flag = False
         self.carry_flag = False
 
         self.halted = False
+
+        self.interrupt_enabled = True
 
 
     def fetch(self):
@@ -59,6 +68,33 @@ class CPU:
         print("FETCH:", instruction)
 
         return instruction
+
+
+    def handle_interrupt(self):
+
+        if not self.interrupt_enabled:
+            return False
+
+        if not self.interrupt.is_pending():
+            return False
+
+        print("INTERRUPT: HANDLING")
+
+        return_address = self.PC
+
+        if self.stack.push(return_address):
+
+            self.SP += 1
+
+            self.interrupt_enabled = False
+
+            self.PC = self.interrupt.get_vector()
+
+            self.interrupt.clear_interrupt()
+
+            return True
+
+        return False
 
 
     def decode_execute(self, instruction):
@@ -232,6 +268,30 @@ class CPU:
             )
 
 
+        elif operation == "INTERRUPT":
+
+            vector = instruction[1]
+
+            self.interrupt.set_vector(vector)
+
+            self.interrupt.request_interrupt()
+
+
+        elif operation == "IRET":
+
+            return_address = self.stack.pop()
+
+            if return_address is not None:
+
+                self.SP -= 1
+
+                self.PC = return_address
+
+                self.interrupt_enabled = True
+
+                return
+
+
         elif operation == "HALT":
 
             InstructionSet.HALT(self)
@@ -249,8 +309,6 @@ class CPU:
             return
 
 
-        # One CPU instruction = one timer tick
-
         self.timer.tick()
 
 
@@ -262,6 +320,12 @@ class CPU:
     def step(self):
 
         if self.halted:
+
+            return
+
+        # Check for pending interrupt before executing instruction
+
+        if self.handle_interrupt():
 
             return
 
@@ -298,6 +362,11 @@ class CPU:
         )
 
         print(
+            "Interrupt Enabled =",
+            self.interrupt_enabled
+        )
+
+        print(
             "Halted     =",
             self.halted
         )
@@ -307,5 +376,7 @@ class CPU:
         self.gpio.show()
 
         self.timer.show()
+
+        self.interrupt.show()
 
         print("---------------------")
