@@ -2,38 +2,28 @@ from cpu import CPU
 from memory import Memory
 
 
-# Create memory
 memory = Memory()
 
-# Create CPU
 cpu = CPU(memory)
 
 
-# Program to test Timer
 program = [
-
-    ("TIMER_RESET",),
-
-    ("TIMER_START",),
-
-    ("TIMER_READ",),
 
     ("MOV", 0, 10),
 
+    ("INTERRUPT", 4),
+
     ("INC", 0),
 
-    ("TIMER_READ",),
+    ("HALT",),
 
-    ("TIMER_STOP",),
+    ("INC", 0),
 
-    ("TIMER_READ",),
-
-    ("HALT",)
+    ("IRET",)
 
 ]
 
 
-# Load program into program memory
 for address, instruction in enumerate(program):
 
     memory.write_program(
@@ -46,7 +36,6 @@ print("===== MicroOS-Sim =====")
 print()
 
 
-# Fetch-Decode-Execute cycle
 while not cpu.halted:
 
     cpu.step()
