@@ -8,26 +8,19 @@ class CPU:
 
         self.memory = memory
 
-        # 8-bit registers R0-R7
         self.registers = [0] * 8
 
-        # Accumulator
         self.A = 0
 
-        # Program Counter
         self.PC = 0
 
-        # Stack Pointer
         self.SP = 7
 
-        # Stack
         self.stack = Stack()
 
-        # Flags
         self.zero_flag = False
         self.carry_flag = False
 
-        # CPU status
         self.halted = False
 
 
@@ -36,7 +29,9 @@ class CPU:
         self.registers = [0] * 8
 
         self.A = 0
+
         self.PC = 0
+
         self.SP = 7
 
         self.stack = Stack()
@@ -60,7 +55,10 @@ class CPU:
 
         if instruction is None:
 
-            print("No instruction at address:", self.PC)
+            print(
+                "No instruction at address:",
+                self.PC
+            )
 
             self.halted = True
 
@@ -148,6 +146,34 @@ class CPU:
                 self.SP -= 1
 
 
+        elif operation == "CALL":
+
+            target_address = instruction[1]
+
+            return_address = self.PC + 1
+
+            if self.stack.push(return_address):
+
+                self.SP += 1
+
+                self.PC = target_address
+
+                return
+
+
+        elif operation == "RET":
+
+            return_address = self.stack.pop()
+
+            if return_address is not None:
+
+                self.SP -= 1
+
+                self.PC = return_address
+
+                return
+
+
         elif operation == "HALT":
 
             InstructionSet.HALT(self)
@@ -155,7 +181,10 @@ class CPU:
 
         else:
 
-            print("Unknown instruction:", operation)
+            print(
+                "Unknown instruction:",
+                operation
+            )
 
             self.halted = True
 
