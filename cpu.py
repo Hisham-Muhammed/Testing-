@@ -1,4 +1,5 @@
 from instructions import InstructionSet
+from stack import Stack
 
 
 class CPU:
@@ -19,6 +20,9 @@ class CPU:
         # Stack Pointer
         self.SP = 7
 
+        # Stack
+        self.stack = Stack()
+
         # Flags
         self.zero_flag = False
         self.carry_flag = False
@@ -34,6 +38,8 @@ class CPU:
         self.A = 0
         self.PC = 0
         self.SP = 7
+
+        self.stack = Stack()
 
         self.zero_flag = False
         self.carry_flag = False
@@ -118,6 +124,30 @@ class CPU:
             )
 
 
+        elif operation == "PUSH":
+
+            register = instruction[1]
+
+            value = self.registers[register]
+
+            if self.stack.push(value):
+
+                self.SP += 1
+
+
+        elif operation == "POP":
+
+            register = instruction[1]
+
+            value = self.stack.pop()
+
+            if value is not None:
+
+                self.registers[register] = value
+
+                self.SP -= 1
+
+
         elif operation == "HALT":
 
             InstructionSet.HALT(self)
@@ -179,5 +209,7 @@ class CPU:
             "Halted     =",
             self.halted
         )
+
+        self.stack.show()
 
         print("---------------------")
