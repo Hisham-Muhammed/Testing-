@@ -9,16 +9,24 @@ memory = Memory()
 cpu = CPU(memory)
 
 
-# Program to test GPIO
+# Program to test Timer
 program = [
 
-    ("SET_PIN", 2),
+    ("TIMER_RESET",),
 
-    ("READ_PIN", 2),
+    ("TIMER_START",),
 
-    ("CLEAR_PIN", 2),
+    ("TIMER_READ",),
 
-    ("READ_PIN", 2),
+    ("MOV", 0, 10),
+
+    ("INC", 0),
+
+    ("TIMER_READ",),
+
+    ("TIMER_STOP",),
+
+    ("TIMER_READ",),
 
     ("HALT",)
 
